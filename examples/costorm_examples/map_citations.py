@@ -39,9 +39,9 @@ def format_references(citation_map):
     references = []
     for citation, resource in sorted(citation_map.items(), key=lambda x: int(x[0])):
         if isinstance(resource, dict):
-            references.append(f"<a id='ref-{citation}'></a>{citation}. [{resource['title']}]({resource['url']})")
+            references.append(f"\n<a id='ref-{citation}'></a>{citation}. [{resource['title']}]({resource['url']})")
         else:
-            references.append(f"<a id='ref-{citation}'></a>{citation}. {resource}")
+            references.append(f"\n<a id='ref-{citation}'></a>{citation}. {resource}")
     return "\n".join(references)
 
 def clean_content(content):

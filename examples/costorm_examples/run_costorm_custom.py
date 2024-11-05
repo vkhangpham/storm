@@ -20,41 +20,46 @@ import logging
 from argparse import ArgumentParser
 from knowledge_storm.collaborative_storm.engine import CollaborativeStormLMConfigs, RunnerArgument, CoStormRunner
 from knowledge_storm.collaborative_storm.modules.callback import LocalConsolePrintCallBackHandler
-from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel, GoogleModel
+from knowledge_storm.lm import OpenAIModel, AzureOpenAIModel, GoogleModel, ClaudeModel
 from knowledge_storm.logging_wrapper import LoggingWrapper
 from knowledge_storm.rm import YouRM, BingSearch, BraveRM, SerperRM, DuckDuckGoSearchRM, TavilySearchRM, SearXNG
 from knowledge_storm.utils import load_api_key
 
 
 def main(args, topic, subject):
-    # load_api_key(toml_file_path='secrets.toml')
+    load_api_key(toml_file_path='/home/khangpham/code/storm/examples/costorm_examples/secrets.toml')
     lm_config: CollaborativeStormLMConfigs = CollaborativeStormLMConfigs()
     
-    openai_kwargs = {
-        "api_key": os.getenv("OPENAI_API_KEY"),
-        "api_provider": "openai",
-        "temperature": 1.0,
-        "top_p": 0.9,
-        "api_base": None,
-    } if os.getenv('OPENAI_API_TYPE') == 'openai' else {
-        "api_key": os.getenv("AZURE_API_KEY"),
-        "temperature": 1.0,
-        "top_p": 0.9,
-        "api_base": os.getenv("AZURE_API_BASE"),
-        "api_version": os.getenv("AZURE_API_VERSION"),
-    }
+    # openai_kwargs = {
+    #     "api_key": os.getenv("OPENAI_API_KEY"),
+    #     "api_provider": "openai",
+    #     "temperature": 1.0,
+    #     "top_p": 0.9,
+    #     "api_base": None,
+    # } if os.getenv('OPENAI_API_TYPE') == 'openai' else {
+    #     "api_key": os.getenv("AZURE_API_KEY"),
+    #     "temperature": 1.0,
+    #     "top_p": 0.9,
+    #     "api_base": os.getenv("AZURE_API_BASE"),
+    #     "api_version": os.getenv("AZURE_API_VERSION"),
+    # }
     
-    GPTModelClass = OpenAIModel if os.getenv('OPENAI_API_TYPE') == 'openai' else AzureOpenAIModel
-    gpt_4o_mini_model_name = 'gpt-4o-mini'
-    gpt_4o_model_name = 'gpt-4o'
-    if os.getenv('OPENAI_API_TYPE') == 'azure':
-        openai_kwargs['api_base'] = os.getenv('AZURE_API_BASE')
-        openai_kwargs['api_version'] = os.getenv('AZURE_API_VERSION')
+    # GPTModelClass = OpenAIModel if os.getenv('OPENAI_API_TYPE') == 'openai' else AzureOpenAIModel
+    # gpt_4o_mini_model_name = 'gpt-4o-mini'
+    # gpt_4o_model_name = 'gpt-4o'
+    # if os.getenv('OPENAI_API_TYPE') == 'azure':
+    #     openai_kwargs['api_base'] = os.getenv('AZURE_API_BASE')
+    #     openai_kwargs['api_version'] = os.getenv('AZURE_API_VERSION')
+    # question_answering_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=1000, **openai_kwargs)
+    # discourse_manage_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=500, **openai_kwargs)
+    # utterance_polishing_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=2000, **openai_kwargs)
+    # warmstart_outline_gen_lm = GPTModelClass(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
+    # question_asking_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=300, **openai_kwargs)
+    # knowledge_base_lm = GPTModelClass(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
 
-    GeminiModelClass = GoogleModel
-    gemini_model_name = 'gemini-1.5-flash'
-    gemini_kwargs = {}
-
+    # GeminiModelClass = GoogleModel
+    # gemini_model_name = 'gemini-1.5-flash'
+    # gemini_kwargs = {}
     # question_answering_lm = GeminiModelClass(model=gemini_model_name, max_tokens=1000, **gemini_kwargs)
     # discourse_manage_lm = GeminiModelClass(model=gemini_model_name, max_tokens=500, **gemini_kwargs)
     # utterance_polishing_lm = GeminiModelClass(model=gemini_model_name, max_tokens=2000, **gemini_kwargs)
@@ -63,12 +68,21 @@ def main(args, topic, subject):
     # question_asking_lm = GeminiModelClass(model=gemini_model_name, max_tokens=300, **gemini_kwargs)
     # knowledge_base_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=1000, **openai_kwargs)
     # knowledge_base_lm = GeminiModelClass(model=gemini_model_name, max_tokens=1000, **gemini_kwargs)
-    question_answering_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=1000, **openai_kwargs)
-    discourse_manage_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=500, **openai_kwargs)
-    utterance_polishing_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=2000, **openai_kwargs)
-    warmstart_outline_gen_lm = GPTModelClass(model=gpt_4o_model_name, max_tokens=500, **openai_kwargs)
-    question_asking_lm = GPTModelClass(model=gpt_4o_mini_model_name, max_tokens=300, **openai_kwargs)
-    knowledge_base_lm = GPTModelClass(model=gpt_4o_model_name, max_tokens=1000, **openai_kwargs)
+
+    anthropic_kwargs = {
+        "api_key": os.getenv("ANTHROPIC_API_KEY"),
+        "temperature": 1.0,
+        "top_p": 0.9,
+    }
+    claude_sonnet = "claude-3-5-sonnet-20241022"
+    claude_haiku = "claude-3-5-haiku-20241022"
+    question_answering_lm = ClaudeModel(model=claude_haiku, max_tokens=1000, **anthropic_kwargs)
+    discourse_manage_lm = ClaudeModel(model=claude_haiku, max_tokens=500, **anthropic_kwargs)
+    utterance_polishing_lm = ClaudeModel(model=claude_haiku, max_tokens=2000, **anthropic_kwargs)
+    warmstart_outline_gen_lm = ClaudeModel(model=claude_sonnet, max_tokens=500, **anthropic_kwargs)
+    question_asking_lm = ClaudeModel(model=claude_haiku, max_tokens=300, **anthropic_kwargs)
+    knowledge_base_lm = ClaudeModel(model=claude_sonnet, max_tokens=1000, **anthropic_kwargs)
+
     lm_config.set_question_answering_lm(question_answering_lm)
     lm_config.set_discourse_manage_lm(discourse_manage_lm)
     lm_config.set_utterance_polishing_lm(utterance_polishing_lm)
@@ -118,15 +132,29 @@ def main(args, topic, subject):
                                    callback_handler=callback_handler)
 
     costorm_runner.warm_start()
-    # print("Knowledge base after warm start:")
-    # costorm_runner.print_knowledge_base()
-    # print("="*50)
+    print("Knowledge base after warm start:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
 
-    user_utterance = f"I want to know about the timeline and milestones of research work in {subject}"
+    user_utterance = f"I'm a new learner in {subject}. Can you give me a brief overview and definition about it?"
     costorm_runner.step(user_utterance=user_utterance)
-    
-    user_utterance = f"What's about the cases where research in {subject} is applied in the real world? Find some concrete examples and prioritize the most famous ones."
+    print("Knowledge base after overview turn:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
+
+    user_utterance = f"What are some recent advancements in {subject}?"
     costorm_runner.step(user_utterance=user_utterance)
+    print("Knowledge base after advancements turn:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
+
+    user_utterance = f"What's about the cases of {subject} being applied in the real world? Find some concrete examples and prioritize the most famous ones."
+    costorm_runner.step(user_utterance=user_utterance)
+    print("Knowledge base after real-world applications turn:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
+
+    costorm_runner.knowledge_base.reorganize()
     
     for _ in range(runner_argument.total_conv_turn):
         costorm_runner.step()
@@ -134,10 +162,16 @@ def main(args, topic, subject):
         # costorm_runner.print_knowledge_base()
         # print("="*50)    
 
-    costorm_runner.knowledge_base.reogranize()
-    # print("Final knowledge base:")
-    # costorm_runner.print_knowledge_base()
-    # print("="*50)
+    user_utterance = f"I want to know about the timeline, milestones, and the main contributors of research in {subject}"
+    costorm_runner.step(user_utterance=user_utterance)
+    print("Knowledge base after milestones turn:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
+
+    costorm_runner.knowledge_base.reorganize()
+    print("Final knowledge base:")
+    costorm_runner.print_knowledge_base()
+    print("="*50)
 
     try:
         article = costorm_runner.generate_report()
@@ -169,23 +203,24 @@ if __name__ == '__main__':
     parser.add_argument('--output-dir', type=str, default='./results/co-storm',
                         help='Directory to store the outputs.')
     parser.add_argument('--retriever', type=str, choices=['bing', 'you', 'brave', 'serper', 'duckduckgo', 'tavily', 'searxng'],
+                        default='tavily',
                         help='The search engine API to use for retrieving information.')
     parser.add_argument(
         '--retrieve_top_k',
         type=int,
-        default=5,
+        default=8,
         help='Retrieve top k results for each query in retriever.'
     )
     parser.add_argument(
         '--max_search_queries',
         type=int,
-        default=2,
+        default=1,
         help='Maximum number of search queries to consider for each question.'
     )
     parser.add_argument(
         '--total_conv_turn',
         type=int,
-        default=1,
+        default=2,
         help='Maximum number of turns in conversation.'
     )
     parser.add_argument(
@@ -197,19 +232,19 @@ if __name__ == '__main__':
     parser.add_argument(
         '--max_search_queries_per_turn',
         type=int,
-        default=2,
+        default=1,
         help='Maximum number of search queries to consider in each turn.'
     )
     parser.add_argument(
         '--warmstart_max_num_experts',
         type=int,
-        default=2,
+        default=3,
         help='Max number of experts in perspective-guided QA during warm start.'
     )
     parser.add_argument(
         '--warmstart_max_turn_per_experts',
         type=int,
-        default=2,
+        default=1,
         help='Max number of turns per perspective during warm start.'
     )
     parser.add_argument(
@@ -228,13 +263,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--max_num_round_table_experts',
         type=int,
-        default=2,
+        default=3,
         help='Max number of active experts in round table discussion.'
     )
     parser.add_argument(
         '--moderator_override_N_consecutive_answering_turn',
         type=int,
-        default=3,
+        default=2,
         help=('Number of consecutive expert answering turns before the moderator overrides the conversation.')
     )
     parser.add_argument(
@@ -250,6 +285,7 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
+    print(args)
 
     # export args to a file
     os.makedirs(args.output_dir, exist_ok=True)
@@ -257,7 +293,16 @@ if __name__ == '__main__':
         json.dump(args.__dict__, f, indent=4)
 
     subjects = [
-        "Data Structure",
+        "Data Structure",  # theoretical natural science
+        "Software Engineering",  # applied natural science
+        "Political Science",  # theoretical social science
+        "Human Resource Management",  # applied social science
+        "Art",  # creative
+    ]
+    
+    # subjects = [
+        # "Mathematics",
+        # "Data Structure",
         # "Computer Science",
         # "Human-Computer Interaction",
         # "Machine Learning",
@@ -278,7 +323,7 @@ if __name__ == '__main__':
         # "Convolutional Neural Network",
         # "Long Short-Term Memory",
         # "Hopfield Network"
-    ]
+    # ]
 
         # "social science",
         # "ecology",

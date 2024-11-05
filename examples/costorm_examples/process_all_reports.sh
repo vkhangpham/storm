@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Find all report.md files in the results directory
-find results/gpt4o/you -name "report.md" | while read report_file; do
+find results -name "report.md" | while read report_file; do
     # Get the directory of the report file
     dir=$(dirname "$report_file")
     
