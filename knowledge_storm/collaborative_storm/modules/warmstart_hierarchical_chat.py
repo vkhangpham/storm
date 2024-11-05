@@ -36,8 +36,6 @@ class WarmStartModerator(dspy.Signature):
     Based on these information, generate the next question for the current expert to further the discussion.
     The question should be engaging and educational to facilitate the learning process.
     
-    Example topics to ask: the real-world applications of the concept, the history of development of the concept, the latest advancements in the concept, the potential future impacts of the concept on society, etc.
-
     The output should only include the next question for the current expert. Do not include any other information or preamble.
     """
 
@@ -280,9 +278,9 @@ class WarmStartConversation(dspy.Module):
 class GenerateWarmStartOutline(dspy.Signature):
     """Generate a outline of the wikipedia-like report from a roundtable discussion.
     This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
-    Since this report aims to be a material for learners of all levels, the report should be comprehensive and engaging.
-    It should cover the most important aspects of the concept, and provide enough details for learners to understand the concept.
-    However, it should not be too technical or too detailed that it becomes overwhelming for learners.
+    Since this report aims to be a material for learners of all levels, the report should cover the most important aspects of the concept.
+    Do not include irrelevant or niche details.
+    It should NEVER be too technical or too detailed that it becomes overwhelming for learners.
     
     You will be presented discussion points in the conversation and corresponding queries.
     You will be given a draft outline which you can borrow some inspiration. Do not include sections that are not mentioned in the given discussion history.
@@ -293,6 +291,9 @@ class GenerateWarmStartOutline(dspy.Signature):
         3. Exclude the topic name from the outline.
     The organization of outline should adopt wikiepdia style.
     Note that similar sections should be grouped together.
+
+    Remember, your outline should contain only the most important aspects of the concept as sections. 
+    This outline should help learners quickly grasp the idea and the context of the concept.
     """
 
     topic = dspy.InputField(prefix="The topic discussed: ", format=str)

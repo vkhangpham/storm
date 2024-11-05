@@ -22,7 +22,10 @@ class QuestionToQuery(dspy.Signature):
     - query 1
     - query 2
     ...
-    - query n"""
+    - query n
+    Note that you should order the queries based on the importance of the information they provide.
+    Only output the queries, no other text.
+    """
 
     topic = dspy.InputField(prefix="Concept context:", format=str)
     question = dspy.InputField(
