@@ -49,8 +49,33 @@ class TogetherEmbeddingModel:
         self.together_client = together.Together(api_key=api_key)
 
     def get_embedding(self, text: str) -> Tuple[np.ndarray, int]:
-        response = self.together_client.embeddings.create(input=text, model=self.model)
+        response = self.together_client.embeddings.create(
+            input=text, model=self.model)
         return response.data[0].embedding, -1
+
+
+class GeminiEmbeddingModel:
+    def __init__(self, model: str = "models/text-embedding-004", api_key: str = None):
+        import google.generativeai as genai
+
+        self.model = model
+        if not api_key:
+            self.api_key = os.getenv("GEMINI_API_KEY")
+        else:
+            self.api_key = api_key
+
+    def get_embedding(self, text: str) -> Tuple[np.ndarray, int]:
+        import google.generativeai as genai
+        
+        genai.configure(api_key=self.api_key)
+
+        result = genai.embed_content(
+            model=self.model,
+            content=text,
+            task_type="SEMANTIC_SIMILARITY",
+        )
+
+        return result["embedding"], -1
 
 
 class AzureOpenAIEmbeddingModel:
@@ -100,12 +125,16 @@ def get_text_embeddings(
         embedding_model = AzureOpenAIEmbeddingModel()
     elif encoder_type == encoder_type == "together":
         embedding_model = TogetherEmbeddingModel()
+    elif encoder_type and encoder_type == "gemini":
+        embedding_model = GeminiEmbeddingModel()
     else:
         raise Exception(
             "No valid encoder type is provided. Check <repo root>/secrets.toml for the field ENCODER_API_TYPE"
         )
 
     def fetch_embedding(text: str) -> Tuple[str, np.ndarray, int]:
+        if not text.strip():
+            return text, np.zeros(len(embedding_model.get_embedding("dummy")[0])), 0
         if embedding_cache is not None and text in embedding_cache:
             return (
                 text,
