@@ -6,6 +6,13 @@ from typing import Union
 class GenerateExpertGeneral(dspy.Signature):
     """You need to select a group of diverse experts who will be suitable to be invited to a roundtable discussion on the given topic.
     Each expert should represent a different perspective, role, or affiliation related to this topic.
+    
+    This discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    Therefore, the experts should be knowledgeable and experienced in the field of the concept.
+    As a rule of thumb, always invite experts who can provide insights and perspectives on the most important aspects of the concept, like history, applications, etc.
+    
+    However, since the discussion is accessible to learners of all levels, the experts should be able to explain the concept in a way that is easy to understand for learners of all levels.
+    
     You can use the background information provided about the topic for inspiration. For each expert, add a description of their expertise and what they will focus on during the discussion.
     No need to include speakers name in the output.
     Strictly follow format below:
@@ -13,9 +20,9 @@ class GenerateExpertGeneral(dspy.Signature):
     2. [speaker 2 role]: [speaker 2 short description]
     """
 
-    topic = dspy.InputField(prefix="Topic of interest:", format=str)
+    topic = dspy.InputField(prefix="Concept of interest:", format=str)
     background_info = dspy.InputField(
-        prefix="Background information about the topic:\n", format=str
+        prefix="Background information about the concept:\n", format=str
     )
     topN = dspy.InputField(prefix="Number of speakers needed: ", format=str)
     experts = dspy.OutputField(format=str)
@@ -23,17 +30,24 @@ class GenerateExpertGeneral(dspy.Signature):
 
 class GenerateExpertWithFocus(dspy.Signature):
     """
-    You need to select a group of speakers who will be suitable to have roundtable discussion on the [topic] of specific [focus].
-    You may consider inviting speakers having opposite stands on the topic; speakers representing different interest parties; Ensure that the selected speakers are directly connected to the specific context and scenario provided.
-    For example, if the discussion focus is about a recent event at a specific university, consider inviting students, faculty members, journalists covering the event, university officials, and local community members.
-    Use the background information provided about the topic for inspiration. For each speaker, add a description of their interests and what they will focus on during the discussion.
+    You need to select a group of speakers who will be suitable to have roundtable discussion on the [concept] of specific [focus].
+    This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    Therefore, the experts should be knowledgeable and experienced in the field of the concept.
+    As a rule of thumb, always invite experts who can provide insights and perspectives on the most important aspects of the concept, like history, applications, etc.
+    
+    However, since the discussion is accessible to learners of all levels, the experts should be able to explain the concept in a way that is easy to understand for learners of all levels.
+    
+    You may consider inviting speakers having opposite stands on the topic; speakers representing different interest parties; 
+    Ensure that the selected speakers are directly connected to the specific context and scenario provided.
+    For example, if the discussion focus is about the real-world applications of AI, consider inviting AI researchers, AI engineers, and industry experts from different fields that applied AI in their work.
+    Use the background information provided about the concept for inspiration. For each speaker, add a description of their interests and what they will focus on during the discussion.
     No need to include speakers name in the output.
     Strictly follow format below:
     1. [speaker 1 role]: [speaker 1 short description]
     2. [speaker 2 role]: [speaker 2 short description]
     """
 
-    topic = dspy.InputField(prefix="Topic of interest:", format=str)
+    topic = dspy.InputField(prefix="Concept of interest:", format=str)
     background_info = dspy.InputField(prefix="Background information:\n", format=str)
     focus = dspy.InputField(prefix="Discussion focus: ", format=str)
     topN = dspy.InputField(prefix="Number of speakers needed: ", format=str)

@@ -4,7 +4,9 @@ from ...dataclass import KnowledgeBase
 
 
 class KnowledgeBaseSummmary(dspy.Signature):
-    """Your job is to give brief summary of what's been discussed in a roundtable conversation. Contents are themantically organized into hierarchical sections.
+    """Your job is to give brief summary of what's been discussed in a roundtable conversation.
+    The content of the discussion will be used to create learning materials for an academic concept, so the summary should be comprehensive and engaging.
+    Contents are themantically organized into hierarchical sections.
     You will be presented with these sections where "#" denotes level of section.
     """
 

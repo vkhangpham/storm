@@ -23,21 +23,25 @@ from ...logging_wrapper import LoggingWrapper
 from ...storm_wiki.modules.outline_generation import WritePageOutline
 from ...utils import ArticleTextProcessing as AP
 
-
 if TYPE_CHECKING:
     from ..engine import RunnerArgument
 
-
 class WarmStartModerator(dspy.Signature):
     """
-    You are a moderator in a roundtable discussion. The goal is to chat with multiple experts to discuss the facts and background of the topic to familiarize the audience with the topic.
-    You will be presented with the topic, the history of question you have already asked, and the current expert you are discussing with.
+    You are a moderator in a roundtable discussion.
+    This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    The goal is to chat with multiple experts to discuss the facts and background of the concept to familiarize the audience with the topic.
+    You will be presented with the concept, the history of question you have already asked, and the current expert you are discussing with.
+
     Based on these information, generate the next question for the current expert to further the discussion.
+    The question should be engaging and educational to facilitate the learning process.
+    
+    Example topics to ask: the real-world applications of the concept, the history of development of the concept, the latest advancements in the concept, the potential future impacts of the concept on society, etc.
 
     The output should only include the next question for the current expert. Do not include any other information or preamble.
     """
 
-    topic = dspy.InputField(prefix="Topic for roundtable discussion: ", format=str)
+    topic = dspy.InputField(prefix="Topic: ", format=str)
     history = dspy.InputField(
         prefix="Experts you have already interacted with: ", format=str
     )
@@ -49,8 +53,10 @@ class WarmStartModerator(dspy.Signature):
 
 class SectionToConvTranscript(dspy.Signature):
     """
-    You are given a section of a brief report on a specific topic. Your task is to transform this section into an engaging opening discussion for a roundtable conversation.
+    You are given a section of a brief report on a specific topic about an academic concept. 
+    Your task is to transform this section into an engaging opening discussion for a roundtable conversation.
     The goal is to help participants and the audience quickly understand the key information.
+    Note that the content of the discussion will be used to create a teaching material for the concept, so the discussion should be engaging and educational.
     Both question and answer should be in the tone of roundtable discussion talking to audiences.
 
     Specifically, you need to:
@@ -188,6 +194,13 @@ class WarmStartConversation(dspy.Module):
             experts, background_seeking_dialogue = self.generate_warmstart_experts(
                 topic=topic
             )
+            
+            ###
+            # print("Warm start experts:")
+            # print(experts)
+            # print("="*50)
+            ###
+            
         # init list to store the dialogue history
         conversation_history: List[ConversationTurn] = []
         lock = Lock()
@@ -223,6 +236,14 @@ class WarmStartConversation(dspy.Module):
                             raw_retrieved_info=answer.raw_retrieved_info,
                             cited_info=answer.cited_info,
                         )
+                        
+                        ###
+                        # print("Warm start question:")
+                        # print(question)
+                        # print(f"Warm start answer: {answer.response}")
+                        # print("="*50)
+                        ###
+                        
                         if self.callback_handler is not None:
                             self.callback_handler.on_warmstart_update(
                                 message="\n".join(
@@ -257,14 +278,21 @@ class WarmStartConversation(dspy.Module):
 
 
 class GenerateWarmStartOutline(dspy.Signature):
-    """Generate a outline of the wikipedia-like report from a roundtable discussion. You will be presented discussion points in the conversation and corresponding queries.
+    """Generate a outline of the wikipedia-like report from a roundtable discussion.
+    This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    Since this report aims to be a material for learners of all levels, the report should be comprehensive and engaging.
+    It should cover the most important aspects of the concept, and provide enough details for learners to understand the concept.
+    However, it should not be too technical or too detailed that it becomes overwhelming for learners.
+    
+    You will be presented discussion points in the conversation and corresponding queries.
     You will be given a draft outline which you can borrow some inspiration. Do not include sections that are not mentioned in the given discussion history.
     Use "#" to denote section headings, "##" to denote subsection headings, and so on.
-     Follow these guidelines:
-     1. Use "#" for section titles, "##" for subsection titles, "###" for subsubsection titles, and so on.
-     2. Do not include any additional information.
-     3. Exclude the topic name from the outline.
-     The organization of outline should adopt wikiepdia style.
+    Follow these guidelines:
+        1. Use "#" for section titles, "##" for subsection titles, "###" for subsubsection titles, and so on. The top level section should be the most general one.
+        2. Do not include any additional information.
+        3. Exclude the topic name from the outline.
+    The organization of outline should adopt wikiepdia style.
+    Note that similar sections should be grouped together.
     """
 
     topic = dspy.InputField(prefix="The topic discussed: ", format=str)
@@ -378,6 +406,13 @@ class WarmStartModule:
             warm_start_outline_output = self.warmstart_outline_gen_module(
                 topic=topic, conv=warm_start_conversation_history
             )
+            
+            ###
+            # print("Warm start outline:")
+            # print(warm_start_outline_output.outline)
+            # print("="*50)
+            ###
+            
         # init knowledge base
         with self.logging_wrapper.log_event("warm start: insert into knowledge base"):
             if self.callback_handler is not None:
@@ -406,3 +441,5 @@ class WarmStartModule:
             engaging_conversations,
             warm_start_experts,
         )
+
+

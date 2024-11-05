@@ -21,7 +21,11 @@ from ...interface import Information
 
 
 class KnowledgeBaseSummmary(dspy.Signature):
-    """Your job is to give brief summary of what's been discussed in a roundtable conversation. Contents are themantically organized into hierarchical sections.
+    """Your job is to give brief summary of what's been discussed in a roundtable conversation. 
+    This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    However, since the discussion is accessible to learners of all levels, try to focus on the most important aspect of the concept. 
+    Do not go too deep into the information as it might bore the audience.
+    Contents are thematically organized into hierarchical sections.
     You will be presented with these sections where "#" denotes level of section.
     """
 
@@ -32,10 +36,13 @@ class KnowledgeBaseSummmary(dspy.Signature):
 
 class ConvertUtteranceStyle(dspy.Signature):
     """
-    You are an invited speaker in the round table conversation.
-    Your task is to make the question or the response more conversational and engaging to facilicate the flow of conversation.
+    You are an invited speaker in the round table conversation, where participants are discussing about an academic concept.
+    The content of the discussion will be used to create a learning material for the concept, so your question or response should be informative and educational.
+    Your question or response should also be conversational and engaging to facilicate the flow of conversation.
     Note that this is ongoing conversation so no need to have welcoming and concluding words. Previous speaker utterance is provided only for making the conversation more natural.
-    Note that do not hallucinate and keep the citation index like [1] as it is. Also,
+    Do not hallucinate and keep the citation index like [1] as it is.
+    However, since the discussion is accessible to learners of all levels, try to focus on the most important aspect of the concept. 
+    Do not go too deep into the information as it might bore the audience.
     """
 
     expert = dspy.InputField(prefix="You are inivited as: ", format=str)
@@ -53,8 +60,18 @@ class ConvertUtteranceStyle(dspy.Signature):
 
 
 class GroundedQuestionGeneration(dspy.Signature):
-    """Your job is to find next discussion focus in a roundtable conversation. You will be given previous conversation summary and some information that might assist you discover new discussion focus.
-    Note that the new discussion focus should bring new angle and perspective to the discussion and avoid repetition. The new discussion focus should be grounded on the available information and push the boundaries of the current discussion for broader exploration.
+    """Your job is to find next discussion focus in a roundtable conversation.
+    This discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    The new discussion focus should bring new angle and perspective to the discussion.
+
+    You will be given previous conversation summary and some information that might assist you discover new discussion focus.
+    The new discussion focus should bring new angle and perspective to the discussion.
+    The new discussion focus should avoid repetition. 
+    The new discussion focus should be grounded on the available information.
+    
+    However, since the discussion is accessible to learners of all levels, try to focus on the most important aspect of the concept. 
+    Do not go too deep into the information as it might bore the audience.
+    
     The new discussion focus should have natural flow from last utterance in the conversation.
     Use [1][2] in line to ground your question.
     """

@@ -15,14 +15,16 @@ from ...interface import Information
 
 class QuestionToQuery(dspy.Signature):
     """You want to answer the question or support a claim using Google search. What do you type in the search box?
-    The question is raised in a round table discussion on a topic. The question may or may not focus on the topic itself.
+    The question is raised in a round table discussion. 
+    This roundtable discussion is about an academic concept, and the content of the discussion will be used to create a learning material for the concept.
+    The question should directly focus on the concept itself, aiming to provide insight on a specific aspect of the concept.
     Write the queries you will use in the following format:
     - query 1
     - query 2
     ...
     - query n"""
 
-    topic = dspy.InputField(prefix="Topic context:", format=str)
+    topic = dspy.InputField(prefix="Concept context:", format=str)
     question = dspy.InputField(
         prefix="I want to collect information about: ", format=str
     )
@@ -32,17 +34,17 @@ class QuestionToQuery(dspy.Signature):
 class AnswerQuestion(dspy.Signature):
     """You are an expert who can use information effectively. You have gathered the related information and will now use the information to form a response.
     Make your response as informative as possible and make sure every sentence is supported by the gathered information.
-    If [Gathered information] is not directly related to the [Topic] and [Question], provide the most relevant answer you can based on the available information, and explain any limitations or gaps.
-    Use [1], [2], ..., [n] in line (for example, "The capital of the United States is Washington, D.C.[1][3].").
+    If [Gathered information] is not directly related to the [Concept] and [Question], respond with "Sorry, there is insufficient information to answer the question."
+    Use [1], [2], ..., [n] in line (for example, "Machine learning has a variety of applications in medicine.[1][3].").
     You DO NOT need to include a References or Sources section to list the sources at the end. The style of writing should be formal.
     """
 
-    topic = dspy.InputField(prefix="Topic you are discussing about:", format=str)
+    topic = dspy.InputField(prefix="Concept you are discussing about:", format=str)
     question = dspy.InputField(prefix="You want to provide insight on: ", format=str)
     info = dspy.InputField(prefix="Gathered information:\n", format=str)
     style = dspy.InputField(prefix="Style of your response should be:", format=str)
     answer = dspy.OutputField(
-        prefix="Now give your response. (Try to use as many different sources as possible and do not hallucinate.)",
+        prefix="Now give your response. (Try to use many different sources and do not hallucinate.)",
         format=str,
     )
 

@@ -14,11 +14,14 @@ from ...interface import Information
 
 
 class InsertInformation(dspy.Signature):
-    """Your job is to insert the given information to the knowledge base. The knowledge base is a tree based data structure to organize the collection information. Each knowledge node contains information derived from themantically similar question or intent.
+    """Your job is to insert the given information to the knowledge base. 
+    The knowledge base is a tree based data structure to organize the collection information about an academic concept.
+    Each knowledge node contains information derived from themantically similar question or intent.
     To decide the best placement of the information, you will be navigated in this tree based data structure layer by layer.
-    You will be presented with the question and query leads to ththeis information, and tree structure.
+    You will be presented with the question and query leads to this information, and tree structure.
+    Make sure that similar information is placed under the same parent node.
 
-    Output should strictly follow one of options presetned below with no other information.
+    Output should strictly follow one of options presented below with no other information.
     - 'insert': to place the information under the current node.
     - 'step: [child node name]': to step into a specified child node.
     - 'create: [new child node name]': to create new child node and insert the info under it.
@@ -37,8 +40,12 @@ class InsertInformation(dspy.Signature):
 
 
 class InsertInformationCandidateChoice(dspy.Signature):
-    """Your job is to insert the given information to the knowledge base. The knowledge base is a tree based data structure to organize the collection information. Each knowledge node contains information derived from themantically similar question or intent.
-    You will be presented with the question and query leads to this information, and candidate choices of placement. In these choices, -> denotes parent-child relationship. Note that reasonable may not be in these choices.
+    """Your job is to insert the given information to the knowledge base. 
+    The knowledge base is a tree based data structure to organize the collection information about an academic concept. 
+    Each knowledge node contains information derived from themantically similar question or intent.
+    You will be presented with the question and query leads to this information, and candidate choices of placement. In these choices, -> denotes parent-child relationship. 
+    Note that reasonable may not be in these choices.
+    Make sure that similar information is placed under the same parent node.
 
     If there exists reasonable choice, output "Best placement: [choice index]"; otherwise, output "No reasonable choice".
     """

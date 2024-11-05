@@ -110,8 +110,13 @@ class ArticleGenerationModule(dspy.Module):
 class WriteSection(dspy.Signature):
     """Write a Wikipedia section based on the collected information. You will be given the topic, the section you are writing and relevant information.
     Each information will be provided with the raw content along with question and query lead to that information.
-    Here is the format of your writing:
-    Use [1], [2], ..., [n] in line (for example, "The capital of the United States is Washington, D.C.[1][3]."). You DO NOT need to include a References or Sources section to list the sources at the end.
+    
+    Note that your writing style should be formal and academic. The section you are writing should have a clear structure and be coherent.
+    For example, if you are writing about the history of the topic, you should include the key milestones and events in the development of the topic, and organize the information in a list in chronological order.
+    Another example, if you are writing about the applications of the topic, you should include concreate examples, and organize the information by different application areas.
+    
+    Use [1], [2], ..., [n] in line (for example, "Machine learning has a variety of applications in medicine [1][3]."). 
+    You DO NOT need to include a References or Sources section to list the sources at the end.
     """
 
     info = dspy.InputField(prefix="The collected information:\n", format=str)

@@ -1,8 +1,9 @@
 import dspy
 import os
+import logging
 from dataclasses import dataclass, field, asdict
 from typing import List, Union, Literal, Optional, Dict
-
+import json
 from .modules import collaborative_storm_utils as collaborative_storm_utils
 from .modules.callback import BaseCallbackHandler
 from .modules.co_storm_agents import (
@@ -19,6 +20,8 @@ from ..logging_wrapper import LoggingWrapper
 from ..lm import OpenAIModel, AzureOpenAIModel, TogetherClient
 from ..rm import BingSearch
 
+# Remove this line:
+# logging.basicConfig(level=logging.DEBUG)
 
 class CollaborativeStormLMConfigs(LMConfigs):
     """Configurations for LLM used in different parts of Co-STORM.
@@ -677,7 +680,13 @@ class CoStormRunner:
                 - Inserts the new turn into the `knowledge_base`, optionally allowing the creation of new nodes or inserting under the root based on the `rag_only_baseline_mode` flag.
                 - If the turn policy specifies, it reorganizes the `knowledge_base` to maintain optimal structure and relevance.
         """
-        last_conv_turn = self.conversation_history[-1]
+        attempt = 0
+        max_attempt = 3
+        while len(self.conversation_history) == 0 and attempt < max_attempt:
+            print("No conversation history, starting warm start...")
+            self.warm_start()
+            attempt += 1
+        last_conv_turn = self.conversation_history[-1] if self.conversation_history else ""
         cur_turn_name = f"conv turn: {len(self.conversation_history) + 1}"
         with self.logging_wrapper.log_pipeline_stage(
             pipeline_stage=f"{cur_turn_name} stage"
@@ -743,3 +752,14 @@ class CoStormRunner:
                             self.callback_handler.on_mindmap_reorg_start()
                         self.knowledge_base.reogranize()
         return conv_turn
+
+    def save_mind_map(self, file_path):
+        mind_map = self.knowledge_base.to_dict()
+        with open(file_path, 'w') as f:
+            json.dump(mind_map, f, indent=2)
+            
+    def print_knowledge_base(self):
+        # print only the tree of the knowledge base
+        self.knowledge_base.print_tree()
+
+
