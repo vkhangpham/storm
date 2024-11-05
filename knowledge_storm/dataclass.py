@@ -6,7 +6,7 @@ from typing import Set, Dict, List, Optional, Union, Tuple
 
 from .encoder import get_text_embeddings
 from .interface import Information
-
+from pprint import pprint
 
 class ConversationTurn:
     """
@@ -847,3 +847,6 @@ class KnowledgeBase:
 
     def to_report(self):
         return self.article_generation_module(knowledge_base=self)
+
+    def print_tree(self):
+        pprint(self.get_node_hierarchy_string(include_indent=True, include_full_path=False, include_hash_tag=True))
